@@ -52,10 +52,11 @@ sampname=$(basename ${in_fastq_r1%%.fastq*})
 mkdir -p ./fastqc_reports_raw
 fastqc $in_fastq_r1 $in_fastq_r2 -o ./fastqc_reports_raw
 
-#Adapter trimming with bbduk -- see single end and fix
+#Adapter trimming with bbduk
+printf "\n\nAdapter trimming ... \n\n\n"
 mkdir -p ./trimmed_fastq
-bbduk.sh in1=$in_fastq_r1 in2=$in_fastq_r2  out1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz' ref=all_adapters.fasta k=23 ktrim=l mink=11 hdist=1 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK stats='./trimmed_fastq/'$sampname'_stats_l.txt'
-bbduk.sh in1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' in2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'  out1='./trimmed_fastq/'$sampname'_trimmed_r1.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2.fastq.gz' ref=all_adapters.fasta k=23 ktrim=r mink=11 hdist=1 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK stats='./trimmed_fastq/'$sampname'_stats_r.txt'
+bbduk.sh in1=$in_fastq_r1 in2=$in_fastq_r2  out1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=r mink=4 hdist=2 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
+bbduk.sh in1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' in2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'  out1='./trimmed_fastq/'$sampname'_trimmed_r1.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=l mink=4 hdist=2 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
 rm './trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' './trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'
 
 #Trimmomatic -- to do: replace this with bbduk like in the single-end case
@@ -87,10 +88,11 @@ mkdir -p ./fastqc_reports_raw
 fastqc $in_fastq -o ./fastqc_reports_raw
 
 #Adapter trimming with bbduk
+printf "\n\nAdapter trimming ... \n\n\n"
 mkdir -p ./trimmed_fastq
 bbduk.sh in=$in_fastq out='./trimmed_fastq/'$sampname'_trimmed_tmp.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=r mink=4 hdist=2 overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
 bbduk.sh in='./trimmed_fastq/'$sampname'_trimmed_tmp.fastq.gz'  out='./trimmed_fastq/'$sampname'_trimmed.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=l mink=4 hdist=2 overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
-rm './trimmed_fastq/'$sampname'_trimmed_tmp.fastq.gz' 
+rm './trimmed_fastq/'$sampname'_trimmed_tmp.fastq.gz'
 
 #Quality trimming
 mkdir -p ./preprocessed_fastq
