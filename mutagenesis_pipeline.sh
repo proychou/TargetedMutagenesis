@@ -59,9 +59,11 @@ bbduk.sh in1=$in_fastq_r1 in2=$in_fastq_r2  out1='./trimmed_fastq/'$sampname'_tr
 bbduk.sh in1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' in2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'  out1='./trimmed_fastq/'$sampname'_trimmed_r1.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=l mink=4 hdist=2 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
 rm './trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' './trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'
 
-#Trimmomatic -- to do: replace this with bbduk like in the single-end case
-java -jar ~/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 './trimmed_fastq/'$sampname'_trimmed_r1.fastq.gz' './trimmed_fastq/'$sampname'_trimmed_r2.fastq.gz' './preprocessed_fastq/'$sampname'_preprocessed_paired_r1.fastq.gz' './preprocessed_fastq/'$sampname'_preprocessed_unpaired_r1.fastq.gz' './preprocessed_fastq/'$sampname'_preprocessed_paired_r2.fastq.gz' './preprocessed_fastq/'$sampname'_preprocessed_unpaired_r2.fastq.gz' LEADING:28 TRAILING:28 SLIDINGWINDOW:4:20 MINLEN:20
-rm './preprocessed_fastq/'$sampname'_preprocessed_unpaired_r1.fastq.gz' './preprocessed_fastq/'$sampname'_preprocessed_unpaired_r2.fastq.gz'
+#Quality trimming
+printf "\n\nQuality trimming ... \n\n\n"
+mkdir -p ./preprocessed_fastq
+bbduk.sh in='./trimmed_fastq/'$sampname'_trimmed.fastq.gz' out='./preprocessed_fastq/'$sampname'_preprocessed.fastq.gz' t=$SLURM_CPUS_PER_TASK qtrim=rl trimq=20 maq=10 overwrite=TRUE minlen=20
+
 
 #FastQC report on processed reads
 mkdir -p ./fastqc_reports_trimmed
