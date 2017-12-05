@@ -247,7 +247,7 @@ var_summary<-data.frame(
   totreads_del_tgt_inframe=sum(var_table$freq[grepl('TRUE',var_table$del_in_target)&
                                                 grepl('FALSE',var_table$del_frameshift)]),
   totreads_del_tgt_frameshift=sum(var_table$freq[grepl('TRUE',var_table$del_in_target)&
-                                                   grepl('TRUE',var_table$del_frameshift)]));
+                                                   grepl('TRUE',var_table$del_frameshift)])
 	totreads_novariants_in_tgt=sum(var_table$freq[grepl('FALSE',var_table$del_in_target)&
 																									grepl('FALSE',var_table$del_frameshift)]));
 var_summary;
