@@ -248,6 +248,8 @@ var_summary<-data.frame(
                                                 grepl('FALSE',var_table$del_frameshift)]),
   totreads_del_tgt_frameshift=sum(var_table$freq[grepl('TRUE',var_table$del_in_target)&
                                                    grepl('TRUE',var_table$del_frameshift)]));
+	totreads_novariants_in_tgt=sum(var_table$freq[grepl('FALSE',var_table$del_in_target)&
+																									grepl('FALSE',var_table$del_frameshift)]));
 var_summary;
 write.csv(var_summary,file=paste(output_dir,sampname,'_variantsummary.csv',sep=''),row.names=F);
 
