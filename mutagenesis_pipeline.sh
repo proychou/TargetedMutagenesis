@@ -2,11 +2,12 @@
 # source /app/Lmod/lmod/lmod/init/bash
 #Pavitra Roychoudhury, Sep 2017
 
-#Load required tools
-module load bowtie2
-# module load samtools
-module load FastQC/0.11.5-Java-1.8.0_92
-module load R-bundle-Bioconductor/3.5-foss-2016b-R-3.4.0-fh1
+#Load required tools before running this script
+# module load bowtie2/2.2.5
+# module load SAMtools/1.8-foss-2016b
+# module load FastQC/0.11.8-Java-1.8
+# module load R/3.6.2-foss-2016b-fh1
+# module load BBMap/38.44-foss-2016b
 
 PATH=$PATH:$HOME/.local/bin:$HOME/bbmap/:$HOME/lofreq_star-2.1.2/bin/
 
@@ -55,8 +56,8 @@ fastqc $in_fastq_r1 $in_fastq_r2 -o ./fastqc_reports_raw
 #Adapter trimming with bbduk
 printf "\n\nAdapter trimming ... \n\n\n"
 mkdir -p ./trimmed_fastq
-bbduk.sh in1=$in_fastq_r1 in2=$in_fastq_r2  out1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=r mink=4 hdist=2 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
-bbduk.sh in1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' in2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'  out1='./trimmed_fastq/'$sampname'_trimmed_r1.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2.fastq.gz' ref=~/bbmap/resources/adapters.fa k=21 ktrim=l mink=4 hdist=2 tpe tbo overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
+bbduk.sh in1=$in_fastq_r1 in2=$in_fastq_r2  out1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz' ref=adapters,artifacts k=21 ktrim=r mink=4 hdist=2 overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
+bbduk.sh in1='./trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' in2='./trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'  out1='./trimmed_fastq/'$sampname'_trimmed_r1.fastq.gz' out2='./trimmed_fastq/'$sampname'_trimmed_r2.fastq.gz' ref=adapters,artifacts k=21 ktrim=r mink=4 hdist=2 overwrite=TRUE t=$SLURM_CPUS_PER_TASK 
 rm './trimmed_fastq/'$sampname'_trimmed_r1_tmp.fastq.gz' './trimmed_fastq/'$sampname'_trimmed_r2_tmp.fastq.gz'
 
 #Quality trimming
@@ -112,9 +113,9 @@ fi
 fi
 
 #Make a sorted bam file
-~/samtools-1.3.1/samtools view -bh -q 10 -o './mapped_reads/'$sampname'.bam' -T $ref'.fasta' './mapped_reads/'$sampname'.sam'  
+samtools view -bh -q 10 -o './mapped_reads/'$sampname'.bam' -T $ref'.fasta' './mapped_reads/'$sampname'.sam'  
 rm './mapped_reads/'$sampname'.sam'
-~/samtools-1.3.1/samtools sort -o './mapped_reads/'$sampname'.sorted.bam' './mapped_reads/'$sampname'.bam' 
+samtools sort -o './mapped_reads/'$sampname'.sorted.bam' './mapped_reads/'$sampname'.bam' 
 rm './mapped_reads/'$sampname'.bam'
 
 reffasta=$ref'.fasta';
@@ -128,7 +129,7 @@ if [ -f $vcfname ]
 then
 rm $vcfname
 fi
-~/samtools-1.3.1/samtools index $bamfname
+samtools index $bamfname
 lofreq call-parallel --pp-threads $SLURM_CPUS_PER_TASK  -f $ref'.fasta' -o $vcfname $bamfname
 
 
