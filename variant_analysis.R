@@ -195,17 +195,18 @@ if(length(locs)>0){
   tmp_ranges<-mclapply(locs,function(x)cigs_query[[x]][pos_ins[[x]]],mc.cores=ncores);
   tmp_seqs<-reads[[1]]$seq[varread_inds][inds][locs];
   var_table$char_insertions[locs]<-unlist(mclapply(c(1:length(locs)),function(i)
-    paste(mclapply(tmp_ranges[[i]],function(x)as.character(tmp_seqs[[i]][x]),mc.cores=ncores),
+    paste(mclapply(tmp_ranges[i],function(x)as.character(tmp_seqs[[i]][x]),mc.cores=ncores),
           collapse=';'),mc.cores=ncores));
   rm(tmp_seqs);
   tmp_quals<-reads[[1]]$qual[varread_inds][inds][locs];
-  tmp_qual<-unlist(mclapply(c(1:length(locs)),function(i)mclapply(tmp_ranges[[i]],function(x)
+  tmp_qual<-unlist(mclapply(c(1:length(locs)),function(i)mclapply(tmp_ranges[i],function(x)
     PhredQuality(tmp_quals[[i]][x]),mc.cores=ncores),mc.cores=ncores)); rm(tmp_quals);
   var_table$phredqual_insertions[locs]<-unlist(mclapply(c(1:length(locs)),function(i)
     paste(unlist(mclapply(tmp_qual[[i]],function(x)
       round(alphabetScore(PhredQuality(x))/width(PhredQuality(x)),1),mc.cores=ncores)),
       collapse=';'),mc.cores=ncores));
-  rm(tmp_qual); tmp_phred<-var_table$phredqual_insertions[locs];
+  rm(tmp_qual); 
+  tmp_phred<-var_table$phredqual_insertions[locs];
   var_table$errprob_insertions[locs]<-unlist(mclapply(tmp_phred,function(x)
     paste(round(10^(-as.numeric(strsplit(x,';')[[1]])/10),digits=4),collapse=';'),mc.cores=ncores));
   rm(tmp_ranges,tmp_phred,locs); gc()
