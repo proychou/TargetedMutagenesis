@@ -9,7 +9,7 @@
 # module load R/3.6.2-foss-2016b-fh1
 # module load BBMap/38.44-foss-2016b
 
-PATH=$PATH:$HOME/.local/bin:$HOME/bbmap/:$HOME/lofreq_star-2.1.2/bin/
+PATH=$PATH:$HOME/.local/bin:$HOME/lofreq_star-2.1.2/bin/
 
 echo $SLURM_CPUS_PER_TASK
 
