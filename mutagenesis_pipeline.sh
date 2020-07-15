@@ -9,7 +9,7 @@
 # module load R/3.6.2-foss-2016b-fh1
 # module load BBMap/38.44-foss-2016b
 
-PATH=$PATH:$HOME/.local/bin:$HOME/lofreq_star-2.1.2/bin/
+PATH=$PATH:$HOME/.local/bin:
 
 echo $SLURM_CPUS_PER_TASK
 
@@ -119,18 +119,6 @@ samtools sort -o './mapped_reads/'$sampname'.sorted.bam' './mapped_reads/'$sampn
 rm './mapped_reads/'$sampname'.bam'
 
 reffasta=$ref'.fasta';
-
-#Call LoFreq on bams
-mkdir -p ./lofreq_vcfs
-bamfname='./mapped_reads/'$sampname'.sorted.bam';
-vcfname='./lofreq_vcfs/'$sampname'.vcf'
-# lofreq doesn't have an overwrite feature so need to remove these files if they exist
-if [ -f $vcfname ]
-then
-rm $vcfname
-fi
-samtools index $bamfname
-lofreq call-parallel --pp-threads $SLURM_CPUS_PER_TASK  -f $ref'.fasta' -o $vcfname $bamfname
 
 
 #Call R script to count variant reads
