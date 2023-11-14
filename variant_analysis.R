@@ -33,18 +33,19 @@ if(length(args)==0){
 
 #Files, directories, target site
 bamfdir<-'./mapped_reads/'; 
-fastq_dir<-'./fastq_files/'; 
+# fastq_dir<-'./fastq_files/';
+# fastq_dir<-dirname(s1);
 output_dir<-'./results/';
 sampname<-strsplit(s1,'_R1_001.fastq.gz')[[1]][1];
 
 # Run QA on fastq files and extract read counts 
 # report(qaSummary,dest=paste(output_dir,s1,'_QAReport',sep=''),type='html')
 if(!paired){
-  qaSummary<-qa(fastq_dir,pattern=s1,type='fastq');
+  qaSummary<-qa(s1,type='fastq');
   n_rawreads<-qaSummary[['readCounts']]$read;
 }else{
-  qaSummary1<-qa(fastq_dir,pattern=s1,type='fastq');
-  qaSummary2<-qa(fastq_dir,pattern=s2,type='fastq');
+  qaSummary1<-qa(s1,type='fastq');
+  qaSummary2<-qa(s2,type='fastq');
   n_rawreads<-qaSummary1[['readCounts']]$read+qaSummary2[['readCounts']]$read;
 }
 
