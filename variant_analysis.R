@@ -278,7 +278,7 @@ selected_reads<-reads[[1]]$qname%in%var_table$name[
 	(!is.na(as.logical(var_table$del_in_target))&as.logical(var_table$del_in_target))|
 		(!is.na(as.logical(var_table$ins_in_target))&as.logical(var_table$ins_in_target))];
 if(sum(selected_reads)>0){
-	filterBam(file=paste(bamfdir,bamfname,sep=''),index=baifname,
+	filterBam(file=bamfname,index=baifname,
 						destination=paste('./filtered_bams/',sampname,'_targetvariantreads.bam',sep=''),
 						filter=selected_reads,param=params); 
 }else{
