@@ -36,7 +36,7 @@ bamfdir<-'./mapped_reads/';
 # fastq_dir<-'./fastq_files/';
 # fastq_dir<-dirname(s1);
 output_dir<-'./results/';
-sampname<-strsplit(s1,'_R1_001.fastq.gz')[[1]][1];
+sampname<-basename(strsplit(s1,'_R1_001.fastq.gz|_R1.fastq.gz')[[1]][1]);
 
 # Run QA on fastq files and extract read counts 
 # report(qaSummary,dest=paste(output_dir,s1,'_QAReport',sep=''),type='html')
@@ -52,12 +52,13 @@ if(!paired){
 
 ## ----import_data---------------------------------------------------------
 ref_seq<-readFasta(refseq_fname);
-bamfname<-grep(sampname,list.files(bamfdir,'*.sorted.bam$'),value=T);
-baifname<-indexBam(paste(bamfdir,bamfname,sep='')); #Make an index file
+# bamfname<-grep(sampname,list.files(bamfdir,'*.sorted.bam$'),value=T);
+bamfname<-paste0(bamfdir,'/',sampname,'.sorted.bam');
+baifname<-indexBam(bamfname); #Make an index file
 params<-ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE),
                      what=c('qname','rname','strand','pos','qwidth','mapq','cigar','seq','qual'));
-reads<-scanBam(file=paste(bamfdir,bamfname,sep=''),
-               index=paste(bamfdir,bamfname,'.bai',sep=''),
+reads<-scanBam(file=bamfname,
+               index=baifname,
                param=params); #import bam file
 
 #locate target sites in ref seq and get start and end positions
