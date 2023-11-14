@@ -258,9 +258,9 @@ write.csv(var_summary,file=paste(output_dir,sampname,'_variantsummary.csv',sep='
 ## ----export_reads--------------------------------------------------------
 
 #Write to fasta
-# reads_out<-DNAStringSet(var_table$seq);
-# names(reads_out)<-var_table$name;
-# writeXStringSet(reads_out,filepath=paste(output_dir,sampname,'_analyzedreads.fa',sep=''));
+reads_out<-DNAStringSet(var_table$seq);
+names(reads_out)<-var_table$name;
+writeXStringSet(reads_out,filepath=paste(output_dir,sampname,'_analyzedreads.fa',sep=''));
 
 #Write to bams
 # if(!dir.exists('./filtered_bams/')) dir.create('./filtered_bams/')
