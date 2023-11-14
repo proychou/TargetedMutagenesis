@@ -113,8 +113,8 @@ head(freq_table);
 tail(freq_table);
 
 ## ----also build and save a pileup----------------------------------------
-pileupdf<-pileup(file=paste(bamfdir,bamfname,sep=''),
-                 index=paste(bamfdir,bamfname,'.bai',sep=''),
+pileupdf<-pileup(file=bamfname,
+                 index=baifname,
                  pileupParam=PileupParam(max_depth=sum(filter_inds),min_base_quality=30,min_mapq=0,
                                          min_nucleotide_depth=1,min_minor_allele_depth=0,
                                          distinguish_strands=T,distinguish_nucleotides=T,
@@ -266,12 +266,12 @@ write.csv(var_summary,file=paste(output_dir,sampname,'_variantsummary.csv',sep='
 if(!dir.exists('./filtered_bams/')) dir.create('./filtered_bams/')
 selected_reads<-as.logical(rep(0,length(reads[[1]]$seq)));
 selected_reads[which(filter_inds)[inds]]<-TRUE;
-filterBam(file=paste(bamfdir,bamfname,sep=''),index=baifname,
+filterBam(file=bamfname,index=baifname,
 					destination=paste('./filtered_bams/',sampname,'_filteredreads.bam',sep=''),
 					filter=selected_reads,param=params); 
 selected_reads<-as.logical(rep(0,length(reads[[1]]$seq)));
 selected_reads[which(varread_inds)[inds]]<-TRUE;
-filterBam(file=paste(bamfdir,bamfname,sep=''),index=baifname,
+filterBam(file=bamfname,index=baifname,
 					destination=paste('./filtered_bams/',sampname,'_variantreads.bam',sep=''),
 					filter=selected_reads,param=params); 
 selected_reads<-reads[[1]]$qname%in%var_table$name[
