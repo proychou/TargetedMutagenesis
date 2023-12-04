@@ -125,7 +125,8 @@ reffasta=$ref'.fasta';
 mkdir -p ./results
 if [[ $paired == "true" ]]
 then
-Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=TRUE s1=\"$(basename $in_fastq_r1)\" s2=\"$(basename $in_fastq_r2)\" refseq_fname=\"$reffasta\"
+# Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=TRUE s1=\"$(basename $in_fastq_r1)\" s2=\"$(basename $in_fastq_r2)\" refseq_fname=\"$reffasta\"
+Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=TRUE s1=\"$in_fastq_r1\" s2=\"$in_fastq_r2\" refseq_fname=\"$reffasta\"
 else
 if [[ $paired == "false" ]]
 then
