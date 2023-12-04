@@ -47,7 +47,7 @@ then
 echo "Missing input argument."
 fi
 
-sampname=$(basename ${in_fastq_r1%%.fastq*})
+sampname=$(basename ${in_fastq_r1%%_R1.fastq*})
 
 #FastQC report on raw reads
 mkdir -p ./fastqc_reports_raw
