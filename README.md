@@ -1,2 +1,2 @@
 # TargetedMutagenesis
-Scripts for quantifying mutations produced by targeted gene editing
+Scripts for counting mutations produced by targeted gene editing
