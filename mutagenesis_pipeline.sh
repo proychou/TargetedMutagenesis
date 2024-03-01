@@ -47,7 +47,7 @@ then
 echo "Missing input argument."
 fi
 
-sampname=$(basename ${in_fastq_r1%%.fastq*})
+sampname=$(basename ${in_fastq_r1%%_R1.fastq*})
 
 #FastQC report on raw reads
 mkdir -p ./fastqc_reports_raw
@@ -84,7 +84,7 @@ then
 echo "Missing input argument."
 fi
 
-sampname=$(basename ${in_fastq%%.fastq*})
+sampname=$(basename ${in_fastq%%_R1.fastq*})
 
 #FastQC report on raw reads
 mkdir -p ./fastqc_reports_raw
@@ -125,13 +125,14 @@ reffasta=$ref'.fasta';
 mkdir -p ./results
 if [[ $paired == "true" ]]
 then
-Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=TRUE s1=\"$(basename $in_fastq_r1)\" s2=\"$(basename $in_fastq_r2)\" refseq_fname=\"$reffasta\"
+# Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=TRUE s1=\"$(basename $in_fastq_r1)\" s2=\"$(basename $in_fastq_r2)\" refseq_fname=\"$reffasta\"
+Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=TRUE s1=\"$in_fastq_r1\" s2=\"$in_fastq_r2\" refseq_fname=\"$reffasta\"
 else
 if [[ $paired == "false" ]]
 then
-Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=FALSE s1=\"$(basename $in_fastq)\" refseq_fname=\"$reffasta\"
+# Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=FALSE s1=\"$(basename $in_fastq)\" refseq_fname=\"$reffasta\"
+Rscript --vanilla hsv_variant_analysis.R tgt_region=\"$tgt\" paired=FALSE s1=\"$in_fastq\" refseq_fname=\"$reffasta\"
 fi
 fi
-
 
 
