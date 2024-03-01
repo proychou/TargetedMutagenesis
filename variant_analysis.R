@@ -33,30 +33,32 @@ if(length(args)==0){
 
 #Files, directories, target site
 bamfdir<-'./mapped_reads/'; 
-fastq_dir<-'./fastq_files/'; 
+# fastq_dir<-'./fastq_files/';
+# fastq_dir<-dirname(s1);
 output_dir<-'./results/';
-sampname<-strsplit(s1,'_R1_001.fastq.gz')[[1]][1];
+sampname<-basename(strsplit(s1,'_R1_001.fastq.gz|_R1.fastq.gz')[[1]][1]);
 
 # Run QA on fastq files and extract read counts 
 # report(qaSummary,dest=paste(output_dir,s1,'_QAReport',sep=''),type='html')
 if(!paired){
-  qaSummary<-qa(fastq_dir,pattern=s1,type='fastq');
+  qaSummary<-qa(s1,type='fastq');
   n_rawreads<-qaSummary[['readCounts']]$read;
 }else{
-  qaSummary1<-qa(fastq_dir,pattern=s1,type='fastq');
-  qaSummary2<-qa(fastq_dir,pattern=s2,type='fastq');
+  qaSummary1<-qa(s1,type='fastq');
+  qaSummary2<-qa(s2,type='fastq');
   n_rawreads<-qaSummary1[['readCounts']]$read+qaSummary2[['readCounts']]$read;
 }
 
 
 ## ----import_data---------------------------------------------------------
 ref_seq<-readFasta(refseq_fname);
-bamfname<-grep(sampname,list.files(bamfdir,'*.sorted.bam$'),value=T);
-baifname<-indexBam(paste(bamfdir,bamfname,sep='')); #Make an index file
+# bamfname<-grep(sampname,list.files(bamfdir,'*.sorted.bam$'),value=T);
+bamfname<-paste0(bamfdir,'/',sampname,'.sorted.bam');
+baifname<-indexBam(bamfname); #Make an index file
 params<-ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE),
                      what=c('qname','rname','strand','pos','qwidth','mapq','cigar','seq','qual'));
-reads<-scanBam(file=paste(bamfdir,bamfname,sep=''),
-               index=paste(bamfdir,bamfname,'.bai',sep=''),
+reads<-scanBam(file=bamfname,
+               index=baifname,
                param=params); #import bam file
 
 #locate target sites in ref seq and get start and end positions
@@ -111,8 +113,8 @@ head(freq_table);
 tail(freq_table);
 
 ## ----also build and save a pileup----------------------------------------
-pileupdf<-pileup(file=paste(bamfdir,bamfname,sep=''),
-                 index=paste(bamfdir,bamfname,'.bai',sep=''),
+pileupdf<-pileup(file=bamfname,
+                 index=baifname,
                  pileupParam=PileupParam(max_depth=sum(filter_inds),min_base_quality=30,min_mapq=0,
                                          min_nucleotide_depth=1,min_minor_allele_depth=0,
                                          distinguish_strands=T,distinguish_nucleotides=T,
@@ -256,32 +258,32 @@ write.csv(var_summary,file=paste(output_dir,sampname,'_variantsummary.csv',sep='
 ## ----export_reads--------------------------------------------------------
 
 #Write to fasta
-# reads_out<-DNAStringSet(var_table$seq);
-# names(reads_out)<-var_table$name;
-# writeXStringSet(reads_out,filepath=paste(output_dir,sampname,'_analyzedreads.fa',sep=''));
+reads_out<-DNAStringSet(var_table$seq);
+names(reads_out)<-var_table$name;
+writeXStringSet(reads_out,filepath=paste(output_dir,sampname,'_analyzedreads.fa',sep=''));
 
 #Write to bams
-if(!dir.exists('./filtered_bams/')) dir.create('./filtered_bams/')
-selected_reads<-as.logical(rep(0,length(reads[[1]]$seq)));
-selected_reads[which(filter_inds)[inds]]<-TRUE;
-filterBam(file=paste(bamfdir,bamfname,sep=''),index=baifname,
-					destination=paste('./filtered_bams/',sampname,'_filteredreads.bam',sep=''),
-					filter=selected_reads,param=params); 
-selected_reads<-as.logical(rep(0,length(reads[[1]]$seq)));
-selected_reads[which(varread_inds)[inds]]<-TRUE;
-filterBam(file=paste(bamfdir,bamfname,sep=''),index=baifname,
-					destination=paste('./filtered_bams/',sampname,'_variantreads.bam',sep=''),
-					filter=selected_reads,param=params); 
-selected_reads<-reads[[1]]$qname%in%var_table$name[
-	(!is.na(as.logical(var_table$del_in_target))&as.logical(var_table$del_in_target))|
-		(!is.na(as.logical(var_table$ins_in_target))&as.logical(var_table$ins_in_target))];
-if(sum(selected_reads)>0){
-	filterBam(file=paste(bamfdir,bamfname,sep=''),index=baifname,
-						destination=paste('./filtered_bams/',sampname,'_targetvariantreads.bam',sep=''),
-						filter=selected_reads,param=params); 
-}else{
-	print('No variants found in target.')
-}
+# if(!dir.exists('./filtered_bams/')) dir.create('./filtered_bams/')
+# selected_reads<-as.logical(rep(0,length(reads[[1]]$seq)));
+# selected_reads[which(filter_inds)[inds]]<-TRUE;
+# filterBam(file=bamfname,index=baifname,
+# 					destination=paste('./filtered_bams/',sampname,'_filteredreads.bam',sep=''),
+# 					filter=selected_reads,param=params); 
+# selected_reads<-as.logical(rep(0,length(reads[[1]]$seq)));
+# selected_reads[which(varread_inds)[inds]]<-TRUE;
+# filterBam(file=bamfname,index=baifname,
+# 					destination=paste('./filtered_bams/',sampname,'_variantreads.bam',sep=''),
+# 					filter=selected_reads,param=params); 
+# selected_reads<-reads[[1]]$qname%in%var_table$name[
+# 	(!is.na(as.logical(var_table$del_in_target))&as.logical(var_table$del_in_target))|
+# 		(!is.na(as.logical(var_table$ins_in_target))&as.logical(var_table$ins_in_target))];
+# if(sum(selected_reads)>0){
+# 	filterBam(file=bamfname,index=baifname,
+# 						destination=paste('./filtered_bams/',sampname,'_targetvariantreads.bam',sep=''),
+# 						filter=selected_reads,param=params); 
+# }else{
+# 	print('No variants found in target.')
+# }
 
 #Clean up
 file.remove(baifname)
